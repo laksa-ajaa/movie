@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+      function show_postbox() {
+        $("#postbox").show();
+      }
+      function hide_postbox() {
+        $("#postbox").hide();
+      }
+      function posting() {
+        let url = $("#url").val();
+        let star = $("#star").val();
+        let comment = $("#comment").val();
+
+        $.ajax({
+          type: "POST",
+          url: "/movie",
+          data: { url_give: url, star_give: star, comment_give: comment },
+          success: function (response) {
+            alert(response["msg"]);
+            window.location.reload();
+          },
+        });
+      }
+      $(document).ready(function () {
+        listing();
+      });
+
+      function listing() {
+        $("#cards-box").empty();
+        $.ajax({
+          type: "GET",
+          url: "/movie",
+          data: {},
+          success: function (response) {
+            let rows = response["movies"];
+            for (let i = 0; i < rows.length; i++) {
+              let image = rows[i]["image"];
+              let title = rows[i]["title"];
+              let description = rows[i]["desc"];
+              let star = rows[i]["star"];
+              let comment = rows[i]["comment"];
+
+              let star_image = "⭐".repeat(star);
+              let temp_html = ` <div class="card mx-3 my-3 col-md-3 p-0 border-0" style="width: 18rem">
+                                  <img src="${image}" class="card-img-top" alt="..." />
+                                  <div class="card-body">
+                                    <h5 class="card-title">${title}</h5>
+                                    <p class="card-text">${description}</p>
+                                    <p class="card-text"><b>Rating: ${star_image}</b></p>
+                                    <p class="mycomment mt-3">${comment}</p>
+                                  </div>
+                                </div>
+                              </div>`;
+
+              $("#cards-box").append(temp_html);
+            }
+          },
+        });
+      }
+    </script>
+    <title>Daftar Film Saya</title>
+    <style>
+      * {
+        font-family: "Nunito", sans-serif;
+      }
+      body {
+        background-color: #0f021e !important;
+      }
+      .banner {
+        background-image: url(https://i.pinimg.com/564x/49/f9/6e/49f96e0d81fcaf0224b434a51d6ff7de.jpg);
+        background-size: cover;
+        background-position: center;
+        width: 100%;
+        height: 300px;
+        color: white;
+        text-shadow: 2px 2px 2px #3a3a3a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .banner > .btn {
+        border-radius: 20px;
+      }
+      .card-film {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      .card-img-top {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+      }
+      .card-text {
+        margin: auto;
+      }
+      .mycomment {
+        color: gray;
+      }
+      .postbox {
+        background-color: white;
+        margin: 20px auto 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 95%;
+        max-width: 500px;
+        padding: 20px;
+        box-shadow: 0 0 3px 0 gray;
+        border-radius: 5px;
+        display: none;
+      }
+      .btn-postbox {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner">
+      <h1>Daftar Film Saya</h1>
+      <a button type="button" class="btn btn-outline-light" id="film" onclick="show_postbox()">Lihat Selengkapnya</a>
+    </div>
+    <div class="postbox" id="postbox">
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="url" placeholder="URL" />
+        <label for="floatingInput">URL Film</label>
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Stars</span>
+        <select class="form-select" aria-label="Default select example" id="star">
+          <option selected>-- Pilih Rating --</option>
+          <option value="1">⭐</option>
+          <option value="2">⭐⭐</option>
+          <option value="3">⭐⭐⭐</option>
+          <option value="4">⭐⭐⭐⭐</option>
+          <option value="5">⭐⭐⭐⭐⭐</option>
+        </select>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="comment" placeholder="Komentar" />
+        <label for="floatingInput">Tulis Komentar kamu</label>
+      </div>
+      <div class="btn-postbox">
+        <button onclick="posting()" type="button" class="btn btn-dark">Save</button>
+        <button type="button" class="btn btn-outline-dark" onclick="hide_postbox()">Close</button>
+      </div>
+    </div>
+    <div class="card-film container" id="film">
+      <div class="row justify-content-center" id="cards-box">
+        <div class="card mx-3 my-3 col-md-3 p-0 border-0" style="width: 18rem">
+          <img src="https://i.pinimg.com/736x/83/26/82/832682edc1e00798905aecdd93ddf35b.jpg" class="card-img-top" alt="..." />
+          <div class="card-body">
+            <h5 class="card-title">Agak Laen</h5>
+            <p class="card-text">Ini adalah tempat pengisian deskripsi mengenai sinopsis singkat terkait film</p>
+            <p class="card-text"><b>Rating:⭐⭐⭐⭐⭐</b></p>
+            <p class="mycomment mt-3">This is comment section</p>
+          </div>
+        </div>
+        <div class="card mx-3 my-3 col-md-3 p-0 border-0" style="width: 18rem">
+          <img src="https://i.pinimg.com/564x/ae/d9/ca/aed9ca8e6fc45cfcb72456f03d5b6991.jpg" class="card-img-top" alt="..." />
+          <div class="card-body">
+            <h5 class="card-title">Ngeri-Ngeri Sedap</h5>
+            <p class="card-text">Ini adalah tempat pengisian deskripsi mengenai sinopsis singkat terkait film</p>
+            <p class="card-text"><b>Rating:⭐⭐⭐⭐</b></p>
+            <p class="mycomment mt-3">This is comment section</p>
+          </div>
+        </div>
+        <div class="card mx-3 my-3 col-md-3 p-0 border-0" style="width: 18rem">
+          <img src="https://i.pinimg.com/564x/25/35/2c/25352c95138e16180b78f00597cf7d03.jpg" class="card-img-top" alt="..." />
+          <div class="card-body">
+            <h5 class="card-title">Miracle in Cell No. 7</h5>
+            <p class="card-text">Ini adalah tempat pengisian deskripsi mengenai sinopsis singkat terkait film</p>
+            <p class="card-text"><b>Rating:⭐⭐⭐⭐⭐</b></p>
+            <p class="mycomment mt-3">This is comment section</p>
+          </div>
+        </div>
+        <div class="card mx-3 my-3 col-md-3 p-0 border-0" style="width: 18rem">
+          <img src="https://i.pinimg.com/564x/d4/98/91/d498917f52c8395b7bce7d7901a03da8.jpg" class="card-img-top" alt="..." />
+          <div class="card-body">
+            <h5 class="card-title">Pengabdi Setan 2</h5>
+            <p class="card-text">Ini adalah tempat pengisian deskripsi mengenai sinopsis singkat terkait film</p>
+            <p class="card-text"><b>Rating:⭐⭐⭐⭐</b></p>
+            <p class="mycomment mt-3">This is comment section</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
